@@ -146,7 +146,8 @@ BOOL keepAvAudioSessionAlwaysActive = NO;
         // try to access file
         NSFileManager* fMgr = [NSFileManager defaultManager];
         if (![fMgr fileExistsAtPath:filePath]) {
-            resourceURL = nil;
+            // Fixed playback position failure after recording.
+            // resourceURL = nil;
             NSLog(@"Unknown resource '%@'", resourcePath);
         }
     }
