@@ -97,6 +97,8 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
     private int seekOnPrepared = 0;     // seek to this location once media is prepared
     private float setRateOnPrepared = -1;
 
+    private float volume = 1.0F;
+
     /**
      * Constructor.
      *
@@ -352,6 +354,16 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
      */
     public void startPlaying(String file) {
         if (this.readyPlayer(file) && this.player != null) {
+            AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            switch (audioManager.getRingerMode()) {
+                case AudioManager.RINGER_MODE_NORMAL:
+                    this.player.setVolume(this.volume, this.volume);
+                    break;
+                case AudioManager.RINGER_MODE_SILENT:
+                case AudioManager.RINGER_MODE_VIBRATE:
+                    this.player.setVolume(0, 0);
+                    break;
+            }
             this.player.start();
             this.setState(STATE.MEDIA_RUNNING);
             this.seekOnPrepared = 0; //insures this is always reset
@@ -503,6 +515,16 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
             this.player.setPlaybackParams (this.player.getPlaybackParams().setSpeed(setRateOnPrepared));
         // If start playing after prepared
         if (!this.prepareOnly) {
+            AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            switch (audioManager.getRingerMode()) {
+                case AudioManager.RINGER_MODE_NORMAL:
+                    this.player.setVolume(this.volume, this.volume);
+                    break;
+                case AudioManager.RINGER_MODE_SILENT:
+                case AudioManager.RINGER_MODE_VIBRATE:
+                    this.player.setVolume(0, 0);
+                    break;
+            }
             this.player.start();
             this.setState(STATE.MEDIA_RUNNING);
             this.seekOnPrepared = 0; //reset only when played
@@ -588,6 +610,7 @@ public class AudioPlayer implements OnCompletionListener, OnPreparedListener, On
      * @param volume
      */
     public void setVolume(float volume) {
+        this.volume = volume;
         if (this.player != null) {
             this.player.setVolume(volume, volume);
         } else {
